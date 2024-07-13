@@ -1,11 +1,32 @@
-import React, { useState } from "react";
+/* eslint-disable react/prop-types */
+import { useState } from "react";
 import { Button, Dialog, DialogTitle, TextField } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
+import axios from "axios";
+import { API_URL } from "../utils";
 
-const UpdateTaskForm = ({ isDialogOpen, setIsDialogOpen, task }) => {
+const UpdateTaskForm = ({
+  fetchTasks,
+  isDialogOpen,
+  setIsDialogOpen,
+  task,
+}) => {
   const { id, completed } = task;
   const [taskName, setTaskName] = useState("");
 
+  const handleUpDateTaskName = async () => {
+    try {
+      await axios.put(API_URL, {
+        id,
+        name: taskName,
+        completed,
+      });
+      await fetchTasks();
+      setTaskName("");
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <Dialog open={isDialogOpen}>
       <DialogTitle>Edit Task</DialogTitle>
@@ -18,7 +39,8 @@ const UpdateTaskForm = ({ isDialogOpen, setIsDialogOpen, task }) => {
         ></TextField>
         <Button
           variant="contained"
-          onClick={() => {
+          onClick={async () => {
+            await handleUpDateTaskName();
             setIsDialogOpen(false);
           }}
         >

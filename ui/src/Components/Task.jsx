@@ -1,20 +1,40 @@
-import React, { useState } from "react";
-import { Box, Checkbox, Typography, Button } from "@mui/material";
+/* eslint-disable react/prop-types */
+import { Checkbox, Typography, Button, Box } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import classnames from "classnames";
+import { useState } from "react";
 import UpdateTaskForm from "./UpdateTaskForm";
+import classnames from "classnames";
 
-const Task = ({ task }) => {
+import axios from "axios";
+import { API_URL } from "../utils";
+
+//error here
+export const Task = ({ task, fetchTasks }) => {
   const { id, name, completed } = task;
   const [isComplete, setIsComplete] = useState(completed);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleUpdateTaskCompletion = () => {
-    setIsComplete(prev => !prev);
+  const handleUpdateTaskCompletion = async () => {
+    try {
+      await axios.put(API_URL, {
+        id,
+        name,
+        completed: !isComplete,
+      });
+      setIsComplete(prev => !prev);
+    } catch (error) {
+      console.log(`Error Updating New Task: ${error}`);
+    }
   };
-  const handleDeleteTask = () => {
-    console.log("delete Task");
+  const handleDeleteTask = async () => {
+    try {
+      //error here
+      await axios.delete(`${API_URL}/${task.id}`);
+      await fetchTasks();
+    } catch (error) {
+      console.log(`Error Updating New Task: ${error}`);
+    }
   };
 
   return (
@@ -51,6 +71,7 @@ const Task = ({ task }) => {
         </Box>
       </div>
       <UpdateTaskForm
+        fetchTasks={fetchTasks}
         isDialogOpen={isDialogOpen}
         setIsDialogOpen={setIsDialogOpen}
         task={task}
@@ -58,5 +79,3 @@ const Task = ({ task }) => {
     </div>
   );
 };
-
-export default Task;
